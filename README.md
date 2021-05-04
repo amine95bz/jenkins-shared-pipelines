@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# jenkins-shared-pipelines
-=======
 # Jenkins DevOps Shared Libraries
 
 A collection of Jenkins Pipeline shared libraries for common DevOps software. Usage and dependencies for each can be found in the [documentation](docs).
