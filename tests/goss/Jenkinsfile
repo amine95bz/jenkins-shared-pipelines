@@ -1,0 +1,53 @@
+// for dynamic retrieval
+library identifier: 'jenkins-devops-libs@master', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: 'https://github.com/mschuchard/jenkins-devops-libs.git'])
+// if added in Jenkins global config shared libraries
+//@Library('jenkins-devops-libs')
+// if added in Jenkins global config shared libraries and the github api plugin is bugging out and slamming github with requests
+//library('jenkins-devops-libs')
+
+pipeline {
+  agent any
+
+  stages {
+    stage('Install') {
+      steps {
+        script {
+          goss.install('0.3.5', '/tmp')
+          goss.install_dgoss('0.3.5', '/tmp')
+        }
+      }
+    }
+    stage('Validate Gossfile') {
+      steps {
+        sh 'curl -L https://raw.githubusercontent.com/mschuchard/jenkins-devops-libs/master/tests/goss/goss.yaml -o /tmp/goss.yaml'
+
+        script {
+          goss.validate_gossfile('/tmp/goss.yaml')
+        }
+      }
+    }
+    stage('Validate Server') {
+      steps {
+        script {
+          goss.validate {
+            gossfile = '/tmp/goss.yaml' // optional location of gossfile
+            bin = '/tmp/goss' // optional executable path for goss
+          }
+        }
+      }
+    }
+    stage('Create Endpoint') {
+      steps {
+        script {
+          goss.server {
+            gossfile = '/tmp/goss.yaml' // optional location of gossfile
+            format = 'documentation' // optional formatter to use for output
+            bin = '/tmp/goss' // optional executable path for goss
+          }
+        }
+      }
+    }
+  }
+}
